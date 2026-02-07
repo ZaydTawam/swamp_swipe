@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useMemo } from "react";
 import { motion, useMotionValue, useTransform, PanInfo, AnimatePresence } from "framer-motion";
+import Link from "next/link";
 import { listings, Listing } from "@/data/listings";
 
 interface Preferences {
@@ -18,6 +19,21 @@ export default function Home() {
   const [likedListings, setLikedListings] = useState<string[]>([]);
   const [skippedListings, setSkippedListings] = useState<string[]>([]);
   const [exitDirection, setExitDirection] = useState<"left" | "right" | null>(null);
+
+  // Load liked listings from localStorage on mount
+  useEffect(() => {
+    const savedLiked = localStorage.getItem("swampswipe_liked");
+    if (savedLiked) {
+      setLikedListings(JSON.parse(savedLiked));
+    }
+  }, []);
+
+  // Save liked listings to localStorage whenever they change
+  useEffect(() => {
+    if (likedListings.length > 0) {
+      localStorage.setItem("swampswipe_liked", JSON.stringify(likedListings));
+    }
+  }, [likedListings]);
   const [showPreferences, setShowPreferences] = useState(false);
   const [preferences, setPreferences] = useState<Preferences>({
     minPrice: 700,
@@ -155,7 +171,7 @@ export default function Home() {
               Preferences
             </button>
             <div className="flex gap-3 text-sm font-medium">
-              <div className="flex items-center gap-2 px-4 py-2 bg-green-50 text-green-700 rounded-lg">
+              <Link href="/liked" className="flex items-center gap-2 px-4 py-2 bg-green-50 text-green-700 rounded-lg hover:bg-green-100 transition-colors cursor-pointer">
                 <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                   <path
                     fillRule="evenodd"
@@ -164,7 +180,7 @@ export default function Home() {
                   />
                 </svg>
                 <span>{likedListings.length}</span>
-              </div>
+              </Link>
               <div className="flex items-center gap-2 px-4 py-2 bg-red-50 text-red-700 rounded-lg">
                 <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                   <path
