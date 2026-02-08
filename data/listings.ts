@@ -15,6 +15,7 @@ export interface Listing {
   };
   liveliness: 1 | 2 | 3 | 4 | 5;
   image: string; // Unsplash image URL
+  website: string; // Apartment website URL
 }
 
 export const listings: Listing[] = [
@@ -28,6 +29,7 @@ export const listings: Listing[] = [
     liveliness: 4,
     image:
       "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800&h=600&fit=crop",
+    website: "https://thestandardgainesville.landmark-properties.com/",
   },
   {
     id: "2",
@@ -39,6 +41,7 @@ export const listings: Listing[] = [
     liveliness: 5,
     image:
       "https://images.unsplash.com/photo-1493809842364-78817add7ffb?w=800&h=600&fit=crop",
+    website: "https://www.lux13apartments.com/",
   },
   {
     id: "3",
@@ -50,6 +53,8 @@ export const listings: Listing[] = [
     liveliness: 3,
     image:
       "https://images.unsplash.com/photo-1556912167-f556f1f39fdf?w=800&h=600&fit=crop",
+    website:
+      "https://www.americancampus.com/student-apartments/fl/gainesville/2nd-avenue-centre",
   },
   {
     id: "4",
@@ -61,6 +66,7 @@ export const listings: Listing[] = [
     liveliness: 5,
     image:
       "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&h=600&fit=crop",
+    website: "https://www.cbgainesville.com/",
   },
   {
     id: "5",
@@ -72,6 +78,7 @@ export const listings: Listing[] = [
     liveliness: 2,
     image:
       "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&h=600&fit=crop",
+    website: "https://hideawaygainesville.com/",
   },
   {
     id: "6",
@@ -83,6 +90,7 @@ export const listings: Listing[] = [
     liveliness: 3,
     image:
       "https://images.unsplash.com/photo-1536376072261-38c75010e6c9?w=800&h=600&fit=crop",
+    website: "https://www.thepavilionon62.com/apartments-in-gainesville-fl/",
   },
   {
     id: "7",
@@ -94,6 +102,7 @@ export const listings: Listing[] = [
     liveliness: 4,
     image:
       "https://images.unsplash.com/photo-1484101403633-562f891dc89a?w=800&h=600&fit=crop",
+    website: "https://livemidtownapts.com/",
   },
   {
     id: "8",
@@ -105,6 +114,7 @@ export const listings: Listing[] = [
     liveliness: 2,
     image:
       "https://images.unsplash.com/photo-1583847268964-b28dc8f51f92?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    website: "https://www.collegeparkatmidtown.com/",
   },
   {
     id: "9",
@@ -116,6 +126,7 @@ export const listings: Listing[] = [
     liveliness: 4,
     image:
       "https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?w=800&h=600&fit=crop",
+    website: "https://www.uhgainesville.com/",
   },
   {
     id: "10",
@@ -127,6 +138,7 @@ export const listings: Listing[] = [
     liveliness: 5,
     image:
       "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=800&h=600&fit=crop",
+    website: "https://www.retreatgainesville.com/",
   },
   {
     id: "11",
@@ -138,6 +150,7 @@ export const listings: Listing[] = [
     liveliness: 1,
     image:
       "https://images.unsplash.com/photo-1600607687644-c7171b42498f?w=800&h=600&fit=crop",
+    website: "https://countrysideatuf.com/",
   },
   {
     id: "12",
@@ -149,6 +162,7 @@ export const listings: Listing[] = [
     liveliness: 4,
     image:
       "https://images.unsplash.com/photo-1630699144867-37acec97df5a?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    website: "https://swamprentals.com/",
   },
   {
     id: "13",
@@ -160,6 +174,7 @@ export const listings: Listing[] = [
     liveliness: 1,
     image:
       "https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?w=800&h=600&fit=crop",
+    website: "https://www.on20apts.com/",
   },
   {
     id: "14",
@@ -171,6 +186,8 @@ export const listings: Listing[] = [
     liveliness: 4,
     image:
       "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&h=600&fit=crop",
+    website:
+      "https://www.apartments.com/the-domain-at-gainesville-gainesville-fl/",
   },
   {
     id: "15",
@@ -182,6 +199,7 @@ export const listings: Listing[] = [
     liveliness: 3,
     image:
       "https://images.unsplash.com/photo-1600566753086-00f18fb6b3ea?w=800&h=600&fit=crop",
+    website: "https://www.cottagegroveatgainesville.com/",
   },
   {
     id: "16",
@@ -193,6 +211,7 @@ export const listings: Listing[] = [
     liveliness: 5,
     image:
       "https://images.unsplash.com/photo-1600585154526-990dced4db0d?w=800&h=600&fit=crop",
+    website: "https://stadiumhousegainesville.com/",
   },
   {
     id: "17",
@@ -204,6 +223,8 @@ export const listings: Listing[] = [
     liveliness: 2,
     image:
       "https://images.unsplash.com/photo-1560440021-33f9b867899d?q=80&w=659&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    website:
+      "https://www.apartmentfinder.com/Florida/Gainesville-Apartments/Gator-Place-Apartments-f1047ys",
   },
   {
     id: "18",
@@ -215,6 +236,7 @@ export const listings: Listing[] = [
     liveliness: 3,
     image:
       "https://images.unsplash.com/photo-1600047509807-ba8f99d2cdde?w=800&h=600&fit=crop",
+    website: "https://www.lakewoodvillas.com/",
   },
   {
     id: "19",
@@ -226,6 +248,7 @@ export const listings: Listing[] = [
     liveliness: 5,
     image:
       "https://images.unsplash.com/photo-1600121848594-d8644e57abab?w=800&h=600&fit=crop",
+    website: "https://www.courtyardsgainesville.com/",
   },
   {
     id: "20",
@@ -237,6 +260,7 @@ export const listings: Listing[] = [
     liveliness: 5,
     image:
       "https://images.unsplash.com/photo-1531835551805-16d864c8d311?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    website: "https://nine31apts.com/",
   },
   {
     id: "21",
@@ -248,6 +272,7 @@ export const listings: Listing[] = [
     liveliness: 1,
     image:
       "https://images.unsplash.com/photo-1600210491892-03d54c0aaf87?w=800&h=600&fit=crop",
+    website: "https://redpoint-gainesville.com/",
   },
   {
     id: "22",
@@ -259,6 +284,7 @@ export const listings: Listing[] = [
     liveliness: 4,
     image:
       "https://images.unsplash.com/photo-1600210491369-e753d80a41f3?w=800&h=600&fit=crop",
+    website: "https://www.thepolosgainesville.com/",
   },
   {
     id: "23",
@@ -270,6 +296,8 @@ export const listings: Listing[] = [
     liveliness: 3,
     image:
       "https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?w=800&h=600&fit=crop",
+    website:
+      "https://www.apartments.com/university-towers-gainesville-fl/",
   },
   {
     id: "24",
@@ -281,6 +309,7 @@ export const listings: Listing[] = [
     liveliness: 2,
     image:
       "https://images.unsplash.com/photo-1600566752355-35792bedcfea?w=800&h=600&fit=crop",
+    website: "https://www.lexingtoncrossingapartments.com/",
   },
   {
     id: "25",
@@ -292,5 +321,6 @@ export const listings: Listing[] = [
     liveliness: 5,
     image:
       "https://images.unsplash.com/photo-1600573472550-8090b5e0745e?w=800&h=600&fit=crop",
+    website: "https://www.theloftsapartmentsgainesville.com/",
   },
 ];

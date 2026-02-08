@@ -184,6 +184,16 @@ export default function LikedPage() {
                       </span>
                     </div>
                   </div>
+
+                  {/* Visit Website */}
+                  <a
+                    href={listing.website}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="block w-full text-center py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-all text-sm"
+                  >
+                    Visit Website
+                  </a>
                 </div>
               </div>
             ))}
