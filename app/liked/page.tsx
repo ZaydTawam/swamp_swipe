@@ -93,9 +93,13 @@ export default function LikedPage() {
                 key={listing.id}
                 className="bg-white rounded-xl shadow-md overflow-hidden border border-gray-200 hover:shadow-lg transition-shadow"
               >
-                {/* Image Placeholder */}
-                <div className="h-48 bg-gradient-to-br from-blue-100 to-blue-200 flex items-center justify-center relative">
-                  <div className="text-5xl opacity-30">🏠</div>
+                {/* Apartment Image */}
+                <div className="h-48 bg-gray-100 relative overflow-hidden">
+                  <img
+                    src={listing.image}
+                    alt={listing.name}
+                    className="w-full h-full object-cover"
+                  />
                   <button
                     onClick={() => handleRemove(listing.id)}
                     className="absolute top-3 right-3 w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-red-50 hover:text-red-600 transition-colors shadow-md group"

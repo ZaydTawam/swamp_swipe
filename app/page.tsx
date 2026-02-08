@@ -1,7 +1,13 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
-import { motion, useMotionValue, useTransform, PanInfo, AnimatePresence } from "framer-motion";
+import {
+  motion,
+  useMotionValue,
+  useTransform,
+  PanInfo,
+  AnimatePresence,
+} from "framer-motion";
 import Link from "next/link";
 import { listings, Listing } from "@/data/listings";
 
@@ -16,24 +22,33 @@ interface Preferences {
 
 export default function Home() {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [likedListings, setLikedListings] = useState<string[]>([]);
-  const [skippedListings, setSkippedListings] = useState<string[]>([]);
-  const [exitDirection, setExitDirection] = useState<"left" | "right" | null>(null);
-
-  // Load liked listings from localStorage on mount
-  useEffect(() => {
-    const savedLiked = localStorage.getItem("swampswipe_liked");
-    if (savedLiked) {
-      setLikedListings(JSON.parse(savedLiked));
+  const [likedListings, setLikedListings] = useState<string[]>(() => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("swampswipe_liked");
+      return saved ? JSON.parse(saved) : [];
     }
-  }, []);
+    return [];
+  });
+  const [skippedListings, setSkippedListings] = useState<string[]>(() => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("swampswipe_skipped");
+      return saved ? JSON.parse(saved) : [];
+    }
+    return [];
+  });
+  const [exitDirection, setExitDirection] = useState<"left" | "right" | null>(
+    null,
+  );
 
   // Save liked listings to localStorage whenever they change
   useEffect(() => {
-    if (likedListings.length > 0) {
-      localStorage.setItem("swampswipe_liked", JSON.stringify(likedListings));
-    }
+    localStorage.setItem("swampswipe_liked", JSON.stringify(likedListings));
   }, [likedListings]);
+
+  // Save skipped listings to localStorage whenever they change
+  useEffect(() => {
+    localStorage.setItem("swampswipe_skipped", JSON.stringify(skippedListings));
+  }, [skippedListings]);
   const [showPreferences, setShowPreferences] = useState(false);
   const [preferences, setPreferences] = useState<Preferences>({
     minPrice: 700,
@@ -65,7 +80,10 @@ export default function Home() {
     let score = 0;
 
     // Price range (50 points) - weighted more heavily
-    if (listing.price >= preferences.minPrice && listing.price <= preferences.maxPrice) {
+    if (
+      listing.price >= preferences.minPrice &&
+      listing.price <= preferences.maxPrice
+    ) {
       score += 50;
     }
 
@@ -81,21 +99,29 @@ export default function Home() {
     }
 
     // Liveliness (10 points) - scale based on difference
-    const livelinessDiff = Math.abs(listing.liveliness - preferences.liveliness);
+    const livelinessDiff = Math.abs(
+      listing.liveliness - preferences.liveliness,
+    );
     score += Math.max(0, 10 - livelinessDiff * 2);
 
     return score;
   };
 
   // Sort listings by score (high to low) and memoize
+  // Filter out already-liked and already-skipped listings
   const sortedListings = useMemo(() => {
     return [...listings]
+      .filter(
+        (listing) =>
+          !likedListings.includes(listing.id) &&
+          !skippedListings.includes(listing.id),
+      )
       .map((listing) => ({
         ...listing,
         score: calculateScore(listing),
       }))
       .sort((a, b) => b.score - a.score);
-  }, [preferences]);
+  }, [preferences, likedListings, skippedListings]);
 
   const currentListing = sortedListings[currentIndex];
   const hasMoreListings = currentIndex < sortedListings.length;
@@ -125,6 +151,16 @@ export default function Home() {
     setCurrentIndex(0); // Reset to first listing
     setLikedListings([]);
     setSkippedListings([]);
+    localStorage.removeItem("swampswipe_liked");
+    localStorage.removeItem("swampswipe_skipped");
+  };
+
+  const handleReset = () => {
+    setCurrentIndex(0);
+    setLikedListings([]);
+    setSkippedListings([]);
+    localStorage.removeItem("swampswipe_liked");
+    localStorage.removeItem("swampswipe_skipped");
   };
 
   const getLivelinessLabel = (score: number) => {
@@ -160,7 +196,12 @@ export default function Home() {
               onClick={() => setShowPreferences(true)}
               className="px-4 py-2 text-sm font-medium text-blue-600 hover:bg-blue-50 rounded-lg transition-colors flex items-center gap-2"
             >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -171,8 +212,15 @@ export default function Home() {
               Preferences
             </button>
             <div className="flex gap-3 text-sm font-medium">
-              <Link href="/liked" className="flex items-center gap-2 px-4 py-2 bg-green-50 text-green-700 rounded-lg hover:bg-green-100 transition-colors cursor-pointer">
-                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+              <Link
+                href="/liked"
+                className="flex items-center gap-2 px-4 py-2 bg-green-50 text-green-700 rounded-lg hover:bg-green-100 transition-colors cursor-pointer"
+              >
+                <svg
+                  className="w-5 h-5"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
                   <path
                     fillRule="evenodd"
                     d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"
@@ -182,7 +230,11 @@ export default function Home() {
                 <span>{likedListings.length}</span>
               </Link>
               <div className="flex items-center gap-2 px-4 py-2 bg-red-50 text-red-700 rounded-lg">
-                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                <svg
+                  className="w-5 h-5"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
                   <path
                     fillRule="evenodd"
                     d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
@@ -200,37 +252,46 @@ export default function Home() {
       <div className="flex-1 flex flex-col items-center justify-center p-8">
         {hasMoreListings ? (
           <>
+            <h2 className="text-lg font-semibold text-gray-500 mb-4">
+              Here' what we found based on your preferences
+            </h2>
             {/* Card Stack */}
             <div className="relative w-full max-w-md h-150">
-              {sortedListings.slice(currentIndex, currentIndex + 3).map((listing, index) => {
-                if (index === 0) {
+              {sortedListings
+                .slice(currentIndex, currentIndex + 3)
+                .map((listing, index) => {
+                  if (index === 0) {
+                    return (
+                      <SwipeCard
+                        key={listing.id}
+                        listing={listing}
+                        onLike={handleLike}
+                        onNope={handleNope}
+                        exitDirection={exitDirection}
+                        getLivelinessLabel={getLivelinessLabel}
+                        score={listing.score}
+                        style={{ zIndex: 3 }}
+                      />
+                    );
+                  }
                   return (
-                    <SwipeCard
+                    <div
                       key={listing.id}
-                      listing={listing}
-                      onLike={handleLike}
-                      onNope={handleNope}
-                      exitDirection={exitDirection}
-                      getLivelinessLabel={getLivelinessLabel}
-                      score={listing.score}
-                      style={{ zIndex: 3 }}
-                    />
+                      className="absolute inset-0 pointer-events-none"
+                      style={{
+                        zIndex: 3 - index,
+                        transform: `scale(${1 - index * 0.05}) translateY(${index * 10}px)`,
+                        opacity: 1 - index * 0.3,
+                      }}
+                    >
+                      <ListingCard
+                        listing={listing}
+                        getLivelinessLabel={getLivelinessLabel}
+                        score={listing.score}
+                      />
+                    </div>
                   );
-                }
-                return (
-                  <div
-                    key={listing.id}
-                    className="absolute inset-0 pointer-events-none"
-                    style={{
-                      zIndex: 3 - index,
-                      transform: `scale(${1 - index * 0.05}) translateY(${index * 10}px)`,
-                      opacity: 1 - index * 0.3,
-                    }}
-                  >
-                    <ListingCard listing={listing} getLivelinessLabel={getLivelinessLabel} score={listing.score} />
-                  </div>
-                );
-              })}
+                })}
             </div>
 
             {/* Action Buttons */}
@@ -239,7 +300,11 @@ export default function Home() {
                 onClick={handleNope}
                 className="w-16 h-16 rounded-full bg-white border-2 border-red-500 hover:bg-red-50 active:scale-95 transition-all shadow-lg flex items-center justify-center"
               >
-                <svg className="w-8 h-8 text-red-500" fill="currentColor" viewBox="0 0 20 20">
+                <svg
+                  className="w-8 h-8 text-red-500"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
                   <path
                     fillRule="evenodd"
                     d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
@@ -251,7 +316,11 @@ export default function Home() {
                 onClick={handleLike}
                 className="w-16 h-16 rounded-full bg-white border-2 border-green-500 hover:bg-green-50 active:scale-95 transition-all shadow-lg flex items-center justify-center"
               >
-                <svg className="w-8 h-8 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                <svg
+                  className="w-8 h-8 text-green-500"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
                   <path
                     fillRule="evenodd"
                     d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"
@@ -264,7 +333,11 @@ export default function Home() {
         ) : (
           <div className="bg-white rounded-2xl p-12 shadow-lg text-center max-w-md border border-gray-200">
             <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <svg className="w-8 h-8 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+              <svg
+                className="w-8 h-8 text-blue-600"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+              >
                 <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" />
                 <path
                   fillRule="evenodd"
@@ -274,9 +347,24 @@ export default function Home() {
               </svg>
             </div>
             <h2 className="text-2xl font-bold text-gray-900 mb-2">All done!</h2>
-            <p className="text-gray-600">
-              You&apos;ve reviewed all available listings. Check back later for more apartments.
+            <p className="text-gray-600 mb-6">
+              You&apos;ve reviewed all available listings. Check your liked
+              apartments or start over!
             </p>
+            <div className="flex gap-3 justify-center">
+              <Link
+                href="/liked"
+                className="px-5 py-2.5 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 transition-all shadow-md"
+              >
+                View Liked
+              </Link>
+              <button
+                onClick={handleReset}
+                className="px-5 py-2.5 bg-gray-100 text-gray-700 font-semibold rounded-xl hover:bg-gray-200 transition-all"
+              >
+                Start Over
+              </button>
+            </div>
           </div>
         )}
       </div>
@@ -318,12 +406,19 @@ function PreferencesModal({
           className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
         >
           <div className="p-6 border-b border-gray-200 flex justify-between items-center">
-            <h2 className="text-2xl font-bold text-gray-900">Your Preferences</h2>
+            <h2 className="text-2xl font-bold text-gray-900">
+              Your Preferences
+            </h2>
             <button
               onClick={onClose}
               className="text-gray-400 hover:text-gray-600 transition-colors"
             >
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg
+                className="w-6 h-6"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -338,7 +433,8 @@ function PreferencesModal({
             {/* Price Range */}
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-3">
-                Monthly Budget: ${preferences.minPrice} - ${preferences.maxPrice}
+                Monthly Budget: ${preferences.minPrice} - $
+                {preferences.maxPrice}
               </label>
               <div className="space-y-3">
                 <div>
@@ -350,7 +446,10 @@ function PreferencesModal({
                     step="50"
                     value={preferences.minPrice}
                     onChange={(e) =>
-                      onPreferencesChange({ ...preferences, minPrice: parseInt(e.target.value) })
+                      onPreferencesChange({
+                        ...preferences,
+                        minPrice: parseInt(e.target.value),
+                      })
                     }
                     className="w-full"
                   />
@@ -364,7 +463,10 @@ function PreferencesModal({
                     step="50"
                     value={preferences.maxPrice}
                     onChange={(e) =>
-                      onPreferencesChange({ ...preferences, maxPrice: parseInt(e.target.value) })
+                      onPreferencesChange({
+                        ...preferences,
+                        maxPrice: parseInt(e.target.value),
+                      })
                     }
                     className="w-full"
                   />
@@ -374,12 +476,16 @@ function PreferencesModal({
 
             {/* Bedrooms */}
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">Bedrooms</label>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                Bedrooms
+              </label>
               <div className="flex gap-2">
                 {[1, 2, 3, 4].map((num) => (
                   <button
                     key={num}
-                    onClick={() => onPreferencesChange({ ...preferences, beds: num })}
+                    onClick={() =>
+                      onPreferencesChange({ ...preferences, beds: num })
+                    }
                     className={`flex-1 py-3 rounded-xl font-semibold transition-all ${
                       preferences.beds === num
                         ? "bg-blue-600 text-white shadow-md"
@@ -527,7 +633,10 @@ function SwipeCard({
 
   const SWIPE_THRESHOLD = 120;
 
-  const handleDragEnd = (_event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
+  const handleDragEnd = (
+    _event: MouseEvent | TouchEvent | PointerEvent,
+    info: PanInfo,
+  ) => {
     if (Math.abs(info.offset.x) > SWIPE_THRESHOLD) {
       if (info.offset.x > 0) {
         onLike();
@@ -555,7 +664,13 @@ function SwipeCard({
       transition={{ duration: 0.3 }}
       className="absolute inset-0 cursor-grab active:cursor-grabbing"
     >
-      <ListingCard listing={listing} showOverlay getLivelinessLabel={getLivelinessLabel} score={score} x={x} />
+      <ListingCard
+        listing={listing}
+        showOverlay
+        getLivelinessLabel={getLivelinessLabel}
+        score={score}
+        x={x}
+      />
     </motion.div>
   );
 }
@@ -592,14 +707,20 @@ function ListingCard({
 
   return (
     <div className="relative w-full h-full bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-200">
-      {/* Photo Placeholder */}
-      <div className="h-64 bg-gray-100 flex items-center justify-center relative">
-        <div className="text-6xl opacity-20">🏠</div>
+      {/* Apartment Image */}
+      <div className="h-64 bg-gray-100 relative overflow-hidden">
+        <img
+          src={listing.image}
+          alt={listing.name}
+          className="w-full h-full object-cover"
+        />
 
         {/* Match Score Badge */}
         {score !== undefined && (
           <div className="absolute top-4 right-4">
-            <div className={`${getMatchColor(score)} text-white px-3 py-1.5 rounded-full text-sm font-bold shadow-lg flex items-center gap-1.5`}>
+            <div
+              className={`${getMatchColor(score)} text-white px-3 py-1.5 rounded-full text-sm font-bold shadow-lg flex items-center gap-1.5`}
+            >
               <span>{score}%</span>
             </div>
           </div>
@@ -635,7 +756,9 @@ function ListingCard({
           <div className="flex items-start justify-between">
             <h2 className="text-2xl font-bold text-gray-900">{listing.name}</h2>
             {score !== undefined && (
-              <span className={`text-xs font-semibold ${getMatchColor(score)} text-white px-2 py-1 rounded`}>
+              <span
+                className={`text-xs font-semibold ${getMatchColor(score)} text-white px-2 py-1 rounded`}
+              >
                 {getMatchLabel(score)}
               </span>
             )}
@@ -648,8 +771,18 @@ function ListingCard({
 
         {/* Floorplan */}
         <div className="flex items-center gap-2 text-gray-700">
-          <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+          <svg
+            className="w-5 h-5 text-gray-400"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
+            />
           </svg>
           <span className="font-medium">
             {listing.floorplan.beds} bed • {listing.floorplan.baths} bath
@@ -663,9 +796,24 @@ function ListingCard({
               Distance to UF
             </p>
             <div className="flex items-center gap-1.5 text-sm font-semibold text-blue-600">
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+              <svg
+                className="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                />
               </svg>
               <span>{listing.distance} mi</span>
             </div>
