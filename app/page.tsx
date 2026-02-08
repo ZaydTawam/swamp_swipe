@@ -28,20 +28,8 @@ interface Preferences {
 
 export default function Home() {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [likedListings, setLikedListings] = useState<string[]>(() => {
-    if (typeof window !== "undefined") {
-      const saved = localStorage.getItem("swampswipe_liked");
-      return saved ? JSON.parse(saved) : [];
-    }
-    return [];
-  });
-  const [skippedListings, setSkippedListings] = useState<string[]>(() => {
-    if (typeof window !== "undefined") {
-      const saved = localStorage.getItem("swampswipe_skipped");
-      return saved ? JSON.parse(saved) : [];
-    }
-    return [];
-  });
+  const [likedListings, setLikedListings] = useState<string[]>([]);
+  const [skippedListings, setSkippedListings] = useState<string[]>([]);
   const [exitDirection, setExitDirection] = useState<"left" | "right" | null>(
     null,
   );
@@ -50,6 +38,7 @@ export default function Home() {
   const [chatInput, setChatInput] = useState("");
   const [chatLoading, setChatLoading] = useState(false);
   const chatEndRef = useRef<HTMLDivElement>(null);
+  const hasLoadedRef = useRef(false);
 
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -111,13 +100,24 @@ export default function Home() {
     }
   };
 
-  // Save liked listings to localStorage whenever they change
+  // Load liked and skipped listings from localStorage on mount
   useEffect(() => {
+    const savedLiked = localStorage.getItem("swampswipe_liked");
+    if (savedLiked) setLikedListings(JSON.parse(savedLiked));
+    const savedSkipped = localStorage.getItem("swampswipe_skipped");
+    if (savedSkipped) setSkippedListings(JSON.parse(savedSkipped));
+    hasLoadedRef.current = true;
+  }, []);
+
+  // Save liked listings to localStorage whenever they change (after initial load)
+  useEffect(() => {
+    if (!hasLoadedRef.current) return;
     localStorage.setItem("swampswipe_liked", JSON.stringify(likedListings));
   }, [likedListings]);
 
-  // Save skipped listings to localStorage whenever they change
+  // Save skipped listings to localStorage whenever they change (after initial load)
   useEffect(() => {
+    if (!hasLoadedRef.current) return;
     localStorage.setItem("swampswipe_skipped", JSON.stringify(skippedListings));
   }, [skippedListings]);
   const [showPreferences, setShowPreferences] = useState(false);
